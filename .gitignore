@@ -1,0 +1,18 @@
+# 设置忽略文件
+*.pdb
+*.pch
+*.obj
+*.tlog
+*.log
+*.idb
+*.lib
+*.exe
+*.dll
+*.ilk
+*.exp
+*.ipch
+*.db
+*.opendb
+*.db-shm
+*.db-wal
+/.git
