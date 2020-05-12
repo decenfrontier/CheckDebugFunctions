@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include "wow64ext.h"
 
+#define QWORD unsigned long long
+
 /* [2020/05/11 20:35]-[Remark: None] */
 /* [通过异常]-[Return:None] */
 bool CheckDebug1()
@@ -31,7 +33,6 @@ bool CheckDebug1()
 /* [通过异常]-[Return:None] */
 bool CheckDebug2()
 {
-	getchar();
 	printf("CheckDebug2\n");
 	HANDLE hTarget, hNewTarget;
 	// 将当前进程的伪句柄转换为真实句柄赋值给hTarget
@@ -48,13 +49,15 @@ bool CheckDebug2()
 	return FALSE;
 }
 
-/* [2020/05/11 19:38]-[Remark: 由于访问不了64位地址,暂时用不了,待研究] */
+/* [2020/05/12 14:59]-[Remark: None] */
 /* [通过检测OD插件-SharpOD的Hook,判断是否在用OD调试]-[Return:None] */
 bool CheckDebug3()
 {
 	// 需先导入wow64ext的h文件,lib文件,以及dll文件
 	DWORD64 dwAddr = GetProcAddress64(GetModuleHandle64((wchar_t*)L"ntdll.dll"), (char*)"NtDuplicateObject");
-	if (((PWORD)dwAddr)[0] == 0xFF25)    // 这里发现它访问不了这个地址,因为它已经超过32位
+	WORD buf;
+	ReadProcessMemory64((HANDLE)-1, dwAddr, &buf, 2,NULL);
+	if (buf == 0x25FF)    
 	{
 		printf("检测到sharpOD插件\n");
 		return TRUE;
@@ -92,7 +95,7 @@ bool __declspec(naked) CheckDebug4()
 
 int main()
 {
-	bool bRet = CheckDebug4();
+	bool bRet = CheckDebug3();
 	if (bRet)
 	{
 		printf("被调试");
